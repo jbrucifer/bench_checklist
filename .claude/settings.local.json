@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(cargo init:*)",
+      "Bash(cargo build:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "Bash(cargo doc:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(start \"\" \"c:\\\\projects\\\\bench_checklist\\\\target\\\\release\\\\bench_checklist.exe\")",
+      "Bash(set RUST_LOG=info:*)",
+      "Bash(targetreleasebench_checklist.exe)",
+      "Bash(c:projectsbench_checklisttargetreleasebench_checklist.exe)",
+      "Bash(cmd.exe /c \"set RUST_LOG=info && c:\\\\projects\\\\bench_checklist\\\\target\\\\release\\\\bench_checklist.exe\")",
+      "Bash(cmd.exe /c start \"\" \"c:\\\\projects\\\\bench_checklist\\\\run_with_log.bat\")",
+      "Bash(ls:*)",
+      "Bash(RUST_LOG=info ./target/release/bench_checklist.exe:*)",
+      "Bash(echo:*)",
+      "Bash(tee:*)",
+      "Bash(start \"\" \"c:\\\\projects\\\\bench_checklist\\\\target\\\\debug\\\\bench_checklist.exe\")",
+      "Bash(type:*)",
+      "Bash(cmd /c \"dir c:\\\\projects\\\\bench_checklist\\\\target\\\\debug\\\\build\"\")",
+      "Bash(cargo check:*)",
+      "Bash(powershell -Command \"Get-Process | Where-Object {$_ProcessName -like ''*edge*''} | Select-Object ProcessName, Id | Format-Table -AutoSize\")",
+      "Bash(cargo run:*)",
+      "Bash(reg query \"HKCU\\\\Software\\\\Microsoft\\\\GameBar\")"
+    ]
+  }
+}

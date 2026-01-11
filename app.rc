@@ -1,0 +1,7 @@
+// Windows resource file for Bench Checklist
+// Embeds the manifest for UAC elevation
+
+#define RT_MANIFEST 24
+#define CREATEPROCESS_MANIFEST_RESOURCE_ID 1
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "bench_checklist.manifest"

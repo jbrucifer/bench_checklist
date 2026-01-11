@@ -1,0 +1,601 @@
+{
+  "version": 2,
+  "default_scenario": "gaming_fps",
+  "scenarios": {
+    "gaming_fps": {
+      "name": "FPS Gaming",
+      "description": "Competitive/esports games requiring maximum FPS",
+      "poll_interval_seconds": 5,
+      "notify_on_drift": true,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (High Performance)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "high_performance"
+        },
+        {
+          "id": "game_mode",
+          "name": "Game Mode Enabled",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKCU\\Software\\Microsoft\\GameBar",
+          "registry_key": "AllowAutoGameMode",
+          "expected_value": "1"
+        },
+        {
+          "id": "hardware_gpu_scheduling",
+          "name": "Hardware GPU Scheduling",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "registry_key": "HwSchMode",
+          "expected_value": "2"
+        },
+        {
+          "id": "xbox_dvr_off",
+          "name": "Xbox DVR Disabled",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKCU\\System\\GameConfigStore",
+          "registry_key": "GameDVR_Enabled",
+          "expected_value": "0"
+        },
+        {
+          "id": "no_discord",
+          "name": "Discord Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "Discord.exe"
+        },
+        {
+          "id": "no_chrome",
+          "name": "Chrome Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": "no_obs",
+          "name": "OBS Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "obs64.exe"
+        },
+        {
+          "id": "no_spotify",
+          "name": "Spotify Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "Spotify.exe"
+        }
+      ]
+    },
+    "gaming_aaa": {
+      "name": "AAA Gaming",
+      "description": "Modern demanding games with visual fidelity focus",
+      "poll_interval_seconds": 5,
+      "notify_on_drift": true,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (High Performance)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "high_performance"
+        },
+        {
+          "id": "hardware_gpu_scheduling",
+          "name": "Hardware GPU Scheduling",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "registry_key": "HwSchMode",
+          "expected_value": "2"
+        },
+        {
+          "id": "visual_effects",
+          "name": "Visual Effects (Best Performance)",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+          "registry_key": "VisualFXSetting",
+          "expected_value": "2"
+        },
+        {
+          "id": "no_discord",
+          "name": "Discord Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "Discord.exe"
+        },
+        {
+          "id": "no_chrome",
+          "name": "Chrome Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": "no_edge",
+          "name": "Edge Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "msedge.exe"
+        },
+        {
+          "id": "no_wallpaper_engine",
+          "name": "Wallpaper Engine Off",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "wallpaper64.exe"
+        }
+      ]
+    },
+    "gaming_vr": {
+      "name": "VR Gaming",
+      "description": "Virtual reality gaming requiring consistent frame times",
+      "poll_interval_seconds": 5,
+      "notify_on_drift": true,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (High Performance)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "high_performance"
+        },
+        {
+          "id": "hardware_gpu_scheduling",
+          "name": "Hardware GPU Scheduling",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "registry_key": "HwSchMode",
+          "expected_value": "2"
+        },
+        {
+          "id": "steamvr_running",
+          "name": "SteamVR Running",
+          "check_type": "process_present",
+          "enabled": false,
+          "process_name": "vrserver.exe"
+        },
+        {
+          "id": "no_discord",
+          "name": "Discord Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "Discord.exe"
+        },
+        {
+          "id": "no_chrome",
+          "name": "Chrome Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": "no_obs",
+          "name": "OBS Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "obs64.exe"
+        }
+      ]
+    },
+    "cpu_single": {
+      "name": "CPU Single-Thread",
+      "description": "Cinebench single, Geekbench single-core tests",
+      "poll_interval_seconds": 10,
+      "notify_on_drift": true,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (High Performance)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "high_performance"
+        },
+        {
+          "id": "background_apps",
+          "name": "Background Apps Disabled",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications",
+          "registry_key": "GlobalUserDisabled",
+          "expected_value": "1"
+        },
+        {
+          "id": "no_chrome",
+          "name": "Chrome Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": "no_firefox",
+          "name": "Firefox Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "firefox.exe"
+        },
+        {
+          "id": "no_edge",
+          "name": "Edge Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "msedge.exe"
+        },
+        {
+          "id": "no_teams",
+          "name": "Teams Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "ms-teams.exe"
+        },
+        {
+          "id": "no_slack",
+          "name": "Slack Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "slack.exe"
+        }
+      ]
+    },
+    "cpu_multi": {
+      "name": "CPU Multi-Thread",
+      "description": "Cinebench multi, Blender, encoding benchmarks",
+      "poll_interval_seconds": 10,
+      "notify_on_drift": true,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (High Performance)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "high_performance"
+        },
+        {
+          "id": "background_apps",
+          "name": "Background Apps Disabled",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications",
+          "registry_key": "GlobalUserDisabled",
+          "expected_value": "1"
+        },
+        {
+          "id": "no_chrome",
+          "name": "Chrome Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": "no_discord",
+          "name": "Discord Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "Discord.exe"
+        },
+        {
+          "id": "no_teams",
+          "name": "Teams Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "ms-teams.exe"
+        },
+        {
+          "id": "no_afterburner",
+          "name": "Afterburner Not Running",
+          "check_type": "process_absent",
+          "enabled": false,
+          "process_name": "MSIAfterburner.exe"
+        }
+      ]
+    },
+    "cpu_stress": {
+      "name": "CPU Stress Test",
+      "description": "Prime95, OCCT, thermal testing",
+      "poll_interval_seconds": 5,
+      "notify_on_drift": true,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (High Performance)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "high_performance"
+        },
+        {
+          "id": "no_chrome",
+          "name": "Chrome Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": "no_discord",
+          "name": "Discord Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "Discord.exe"
+        },
+        {
+          "id": "no_spotify",
+          "name": "Spotify Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "Spotify.exe"
+        }
+      ]
+    },
+    "gpu_synthetic": {
+      "name": "GPU Synthetic",
+      "description": "3DMark, Unigine, FurMark benchmarks",
+      "poll_interval_seconds": 5,
+      "notify_on_drift": true,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (High Performance)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "high_performance"
+        },
+        {
+          "id": "hardware_gpu_scheduling",
+          "name": "Hardware GPU Scheduling",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "registry_key": "HwSchMode",
+          "expected_value": "2"
+        },
+        {
+          "id": "visual_effects",
+          "name": "Visual Effects (Best Performance)",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+          "registry_key": "VisualFXSetting",
+          "expected_value": "2"
+        },
+        {
+          "id": "no_chrome",
+          "name": "Chrome Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": "no_discord",
+          "name": "Discord Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "Discord.exe"
+        },
+        {
+          "id": "no_wallpaper_engine",
+          "name": "Wallpaper Engine Off",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "wallpaper64.exe"
+        }
+      ]
+    },
+    "gpu_compute": {
+      "name": "GPU Compute",
+      "description": "CUDA/OpenCL workloads, ML inference",
+      "poll_interval_seconds": 10,
+      "notify_on_drift": true,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (High Performance)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "high_performance"
+        },
+        {
+          "id": "hardware_gpu_scheduling",
+          "name": "Hardware GPU Scheduling",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "registry_key": "HwSchMode",
+          "expected_value": "2"
+        },
+        {
+          "id": "no_chrome",
+          "name": "Chrome Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": "no_edge",
+          "name": "Edge Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "msedge.exe"
+        },
+        {
+          "id": "no_obs",
+          "name": "OBS Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "obs64.exe"
+        }
+      ]
+    },
+    "gpu_render": {
+      "name": "GPU Rendering",
+      "description": "Blender GPU, OctaneRender, V-Ray GPU",
+      "poll_interval_seconds": 10,
+      "notify_on_drift": true,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (High Performance)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "high_performance"
+        },
+        {
+          "id": "hardware_gpu_scheduling",
+          "name": "Hardware GPU Scheduling",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "registry_key": "HwSchMode",
+          "expected_value": "2"
+        },
+        {
+          "id": "no_chrome",
+          "name": "Chrome Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": "no_discord",
+          "name": "Discord Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "Discord.exe"
+        },
+        {
+          "id": "no_obs",
+          "name": "OBS Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "obs64.exe"
+        },
+        {
+          "id": "no_wallpaper_engine",
+          "name": "Wallpaper Engine Off",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "wallpaper64.exe"
+        }
+      ]
+    },
+    "productivity": {
+      "name": "Productivity",
+      "description": "Office, browsing, general work applications",
+      "poll_interval_seconds": 15,
+      "notify_on_drift": false,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (Balanced)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "balanced"
+        }
+      ]
+    },
+    "content_creation": {
+      "name": "Content Creation",
+      "description": "Video editing, Photoshop, DAW audio production",
+      "poll_interval_seconds": 10,
+      "notify_on_drift": true,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (High Performance)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "high_performance"
+        },
+        {
+          "id": "hardware_gpu_scheduling",
+          "name": "Hardware GPU Scheduling",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "registry_key": "HwSchMode",
+          "expected_value": "2"
+        },
+        {
+          "id": "no_discord",
+          "name": "Discord Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "Discord.exe"
+        },
+        {
+          "id": "no_spotify",
+          "name": "Spotify Not Running",
+          "check_type": "process_absent",
+          "enabled": false,
+          "process_name": "Spotify.exe"
+        },
+        {
+          "id": "no_teams",
+          "name": "Teams Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "ms-teams.exe"
+        }
+      ]
+    },
+    "streaming": {
+      "name": "Streaming/Recording",
+      "description": "OBS streaming, game capture, live production",
+      "poll_interval_seconds": 5,
+      "notify_on_drift": true,
+      "checks": [
+        {
+          "id": "power_plan",
+          "name": "Power Plan (High Performance)",
+          "check_type": "power_scheme",
+          "enabled": true,
+          "expected_value": "high_performance"
+        },
+        {
+          "id": "game_mode",
+          "name": "Game Mode Enabled",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKCU\\Software\\Microsoft\\GameBar",
+          "registry_key": "AllowAutoGameMode",
+          "expected_value": "1"
+        },
+        {
+          "id": "hardware_gpu_scheduling",
+          "name": "Hardware GPU Scheduling",
+          "check_type": "registry_dword",
+          "enabled": true,
+          "registry_path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "registry_key": "HwSchMode",
+          "expected_value": "2"
+        },
+        {
+          "id": "obs_running",
+          "name": "OBS Studio Running",
+          "check_type": "process_present",
+          "enabled": false,
+          "process_name": "obs64.exe"
+        },
+        {
+          "id": "no_chrome",
+          "name": "Chrome Not Running",
+          "check_type": "process_absent",
+          "enabled": true,
+          "process_name": "chrome.exe"
+        },
+        {
+          "id": "no_discord",
+          "name": "Discord Not Running",
+          "check_type": "process_absent",
+          "enabled": false,
+          "process_name": "Discord.exe"
+        }
+      ]
+    }
+  }
+}
