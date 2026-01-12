@@ -79,6 +79,9 @@ pub enum CheckType {
     RegistryString,
     ProcessAbsent,
     ProcessPresent,
+    DisplayResolution,
+    DisplayRefreshRate,
+    HdrEnabled,
 }
 
 /// Helper functions to create default scenarios

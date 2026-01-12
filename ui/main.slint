@@ -1,0 +1,338 @@
+// Bench Checklist Main Window
+// Performance testing checklist monitor for Windows
+
+import { AppTheme } from "theme.slint";
+import { ScrollView, ComboBox, Button, CheckBox, Slider, ProgressIndicator } from "std-widgets.slint";
+import { CheckItemData, ScenarioData, LibraryCheckData, CheckEditorData } from "types.slint";
+import { StatusCard } from "components/status_card.slint";
+import { CheckList } from "components/check_list.slint";
+import { CheckEditor } from "components/check_editor.slint";
+import { CheckLibrary } from "components/check_library.slint";
+import { SettingsPanel } from "components/settings_panel.slint";
+
+// Re-export types for Rust binding
+export { CheckItemData, ScenarioData, LibraryCheckData, CheckEditorData }
+
+export component MainWindow inherits Window {
+    title: "Bench Checklist";
+    preferred-width: 520px;
+    min-width: 450px;
+    preferred-height: 700px;
+    min-height: 500px;
+    background: AppTheme.bg-window;
+
+    // Properties bound from Rust
+    in-out property <[CheckItemData]> checks: [];
+    in-out property <[ScenarioData]> scenarios: [];
+    in-out property <[string]> scenario-names: [];
+    in-out property <string> active-scenario: "";
+    in-out property <int> passed-count: 0;
+    in-out property <int> total-count: 0;
+    in-out property <int> poll-interval: 5;
+    in-out property <bool> notify-on-drift: true;
+    in-out property <string> status-message: "";
+    in-out property <[LibraryCheckData]> library-checks: [];
+    in-out property <[string]> library-categories: [];
+
+    // Modal visibility state
+    in-out property <bool> show-check-editor: false;
+    in-out property <bool> show-check-library: false;
+    in-out property <CheckEditorData> editor-data: {
+        id: "",
+        name: "",
+        check-type: "PowerScheme",
+        enabled: true,
+        expected-value: "",
+        registry-path: "",
+        registry-key: "",
+        process-name: "",
+        is-editing: false,
+    };
+
+    // Filter state
+    in-out property <string> check-filter: "All"; // "All", "Failed", "Passed"
+
+    // Callbacks to Rust
+    callback check-toggled(string, bool);
+    callback check-now-clicked();
+    callback save-clicked();
+    callback reload-clicked();
+    callback scenario-changed(string);
+    callback add-check-clicked();
+    callback edit-check(string);
+    callback delete-check(string);
+    callback open-library();
+    callback add-from-library(string);
+    callback save-check(CheckEditorData);
+    callback poll-interval-changed(int);
+    callback notify-drift-changed(bool);
+    callback fix-all-clicked();
+
+    // Main content
+    VerticalLayout {
+        padding: AppTheme.spacing-lg;
+        spacing: AppTheme.spacing-md;
+
+        // Title
+        Text {
+            text: "BENCH CHECKLIST";
+            color: AppTheme.text-primary;
+            font-size: AppTheme.font-xl;
+            font-weight: 700;
+            horizontal-alignment: left;
+        }
+
+        // Status Card
+        StatusCard {
+            passed: passed-count;
+            total: total-count;
+            fix-clicked => { fix-all-clicked(); }
+        }
+
+        // Scenario Selector
+        Rectangle {
+            background: AppTheme.bg-card;
+            border-radius: AppTheme.radius-md;
+            border-width: 1px;
+            border-color: AppTheme.border;
+            height: 80px;
+
+            VerticalLayout {
+                padding: AppTheme.spacing-md;
+                spacing: AppTheme.spacing-sm;
+
+                Text {
+                    text: "Active Scenario";
+                    color: AppTheme.text-secondary;
+                    font-size: AppTheme.font-sm;
+                }
+
+                ComboBox {
+                    model: scenario-names;
+                    current-value: active-scenario;
+                    selected(value) => {
+                        scenario-changed(value);
+                    }
+                }
+            }
+        }
+
+        // Filter tabs and Add button
+        HorizontalLayout {
+            spacing: AppTheme.spacing-sm;
+
+            Rectangle {
+                background: check-filter == "All" ? AppTheme.primary : AppTheme.bg-elevated;
+                border-radius: AppTheme.radius-sm;
+                height: 32px;
+                horizontal-stretch: 1;
+
+                TouchArea {
+                    clicked => { check-filter = "All"; }
+                    Text {
+                        text: "All";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-sm;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            Rectangle {
+                background: check-filter == "Failed" ? AppTheme.error : AppTheme.bg-elevated;
+                border-radius: AppTheme.radius-sm;
+                height: 32px;
+                horizontal-stretch: 1;
+
+                TouchArea {
+                    clicked => { check-filter = "Failed"; }
+                    Text {
+                        text: "Failed";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-sm;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            Rectangle {
+                background: check-filter == "Passed" ? AppTheme.success : AppTheme.bg-elevated;
+                border-radius: AppTheme.radius-sm;
+                height: 32px;
+                horizontal-stretch: 1;
+
+                TouchArea {
+                    clicked => { check-filter = "Passed"; }
+                    Text {
+                        text: "Passed";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-sm;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            Rectangle {
+                background: AppTheme.primary;
+                border-radius: AppTheme.radius-sm;
+                height: 32px;
+                width: 100px;
+
+                TouchArea {
+                    clicked => { add-check-clicked(); }
+                    Text {
+                        text: "+ Add";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-sm;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            Rectangle {
+                background: AppTheme.bg-elevated;
+                border-radius: AppTheme.radius-sm;
+                border-width: 1px;
+                border-color: AppTheme.border;
+                height: 32px;
+                width: 100px;
+
+                TouchArea {
+                    clicked => { open-library(); }
+                    Text {
+                        text: "Library";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-sm;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+
+        // Check List
+        CheckList {
+            checks: checks;
+            filter: check-filter;
+            vertical-stretch: 1;
+            toggled(id, enabled) => { check-toggled(id, enabled); }
+            edit-requested(id) => { edit-check(id); }
+            delete-requested(id) => { delete-check(id); }
+        }
+
+        // Settings Panel (collapsible)
+        SettingsPanel {
+            poll-interval: poll-interval;
+            notify-on-drift: notify-on-drift;
+            poll-changed(val) => { poll-interval-changed(val); }
+            notify-changed(val) => { notify-drift-changed(val); }
+        }
+
+        // Action Buttons
+        HorizontalLayout {
+            spacing: AppTheme.spacing-sm;
+
+            Rectangle {
+                background: AppTheme.primary;
+                border-radius: AppTheme.radius-sm;
+                height: AppTheme.button-height;
+                horizontal-stretch: 1;
+
+                TouchArea {
+                    clicked => { check-now-clicked(); }
+                    Text {
+                        text: "Check Now";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-md;
+                        font-weight: 600;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            Rectangle {
+                background: AppTheme.bg-elevated;
+                border-radius: AppTheme.radius-sm;
+                border-width: 1px;
+                border-color: AppTheme.border;
+                height: AppTheme.button-height;
+                horizontal-stretch: 1;
+
+                TouchArea {
+                    clicked => { save-clicked(); }
+                    Text {
+                        text: "Save";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-md;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            Rectangle {
+                background: AppTheme.bg-elevated;
+                border-radius: AppTheme.radius-sm;
+                border-width: 1px;
+                border-color: AppTheme.border;
+                height: AppTheme.button-height;
+                horizontal-stretch: 1;
+
+                TouchArea {
+                    clicked => { reload-clicked(); }
+                    Text {
+                        text: "Reload";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-md;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+
+        // Status message
+        if status-message != "": Rectangle {
+            background: AppTheme.success.with-alpha(0.2);
+            border-radius: AppTheme.radius-sm;
+            height: 32px;
+
+            Text {
+                text: status-message;
+                color: AppTheme.success;
+                font-size: AppTheme.font-sm;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+    }
+
+    // Check Editor Modal
+    if show-check-editor: CheckEditor {
+        data: editor-data;
+        save-clicked(data) => {
+            save-check(data);
+            show-check-editor = false;
+        }
+        cancel-clicked => {
+            show-check-editor = false;
+        }
+    }
+
+    // Check Library Modal
+    if show-check-library: CheckLibrary {
+        checks: library-checks;
+        categories: library-categories;
+        add-clicked(id) => {
+            add-from-library(id);
+        }
+        close-clicked => {
+            show-check-library = false;
+        }
+    }
+}

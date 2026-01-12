@@ -1,0 +1,310 @@
+// Check Editor Modal
+// Modal dialog for creating/editing checks
+
+import { AppTheme } from "../theme.slint";
+import { LineEdit, ComboBox, CheckBox } from "std-widgets.slint";
+import { CheckEditorData } from "../types.slint";
+
+export component CheckEditor inherits Rectangle {
+    in-out property <CheckEditorData> data;
+
+    callback save-clicked(CheckEditorData);
+    callback cancel-clicked();
+
+    // Check type options
+    property <[string]> check-types: [
+        "PowerScheme",
+        "PowerMode",
+        "RegistryDword",
+        "RegistryString",
+        "ProcessAbsent",
+        "ProcessPresent",
+        "DisplayResolution",
+        "DisplayRefreshRate",
+        "HdrEnabled",
+    ];
+
+    property <[string]> power-schemes: ["high_performance", "ultimate_performance", "balanced", "power_saver"];
+    property <[string]> power-modes: ["better_performance", "best_performance", "best_power_efficiency"];
+    property <[string]> resolutions: ["3840x2160", "2560x1440", "1920x1080", "1280x720"];
+    property <[string]> refresh-rates: ["60", "120", "144", "165", "240", "360"];
+    property <[string]> hdr-options: ["1", "0"];
+
+    // Modal overlay
+    background: #000000.with-alpha(0.5);
+
+    TouchArea {
+        // Prevent clicks from passing through
+    }
+
+    // Modal dialog
+    Rectangle {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        width: 400px;
+        height: 500px;
+        background: AppTheme.bg-card;
+        border-radius: AppTheme.radius-lg;
+        border-width: 1px;
+        border-color: AppTheme.border;
+
+        VerticalLayout {
+            padding: AppTheme.spacing-lg;
+            spacing: AppTheme.spacing-md;
+
+            // Header
+            Text {
+                text: data.is-editing ? "Edit Check" : "Add Check";
+                color: AppTheme.text-primary;
+                font-size: AppTheme.font-xl;
+                font-weight: 700;
+            }
+
+            // Form fields
+            VerticalLayout {
+                spacing: AppTheme.spacing-md;
+
+                // ID field
+                VerticalLayout {
+                    spacing: AppTheme.spacing-xs;
+                    Text {
+                        text: "ID";
+                        color: AppTheme.text-secondary;
+                        font-size: AppTheme.font-sm;
+                    }
+                    LineEdit {
+                        text: data.id;
+                        enabled: !data.is-editing;
+                        placeholder-text: "unique_check_id";
+                        edited(val) => { data.id = val; }
+                    }
+                }
+
+                // Name field
+                VerticalLayout {
+                    spacing: AppTheme.spacing-xs;
+                    Text {
+                        text: "Name";
+                        color: AppTheme.text-secondary;
+                        font-size: AppTheme.font-sm;
+                    }
+                    LineEdit {
+                        text: data.name;
+                        placeholder-text: "Check display name";
+                        edited(val) => { data.name = val; }
+                    }
+                }
+
+                // Check type
+                VerticalLayout {
+                    spacing: AppTheme.spacing-xs;
+                    Text {
+                        text: "Check Type";
+                        color: AppTheme.text-secondary;
+                        font-size: AppTheme.font-sm;
+                    }
+                    ComboBox {
+                        model: check-types;
+                        current-value: data.check-type;
+                        selected(val) => { data.check-type = val; }
+                    }
+                }
+
+                // Type-specific fields
+                if data.check-type == "PowerScheme": VerticalLayout {
+                    spacing: AppTheme.spacing-xs;
+                    Text {
+                        text: "Power Scheme";
+                        color: AppTheme.text-secondary;
+                        font-size: AppTheme.font-sm;
+                    }
+                    ComboBox {
+                        model: power-schemes;
+                        current-value: data.expected-value;
+                        selected(val) => { data.expected-value = val; }
+                    }
+                }
+
+                if data.check-type == "PowerMode": VerticalLayout {
+                    spacing: AppTheme.spacing-xs;
+                    Text {
+                        text: "Power Mode";
+                        color: AppTheme.text-secondary;
+                        font-size: AppTheme.font-sm;
+                    }
+                    ComboBox {
+                        model: power-modes;
+                        current-value: data.expected-value;
+                        selected(val) => { data.expected-value = val; }
+                    }
+                }
+
+                if data.check-type == "RegistryDword" || data.check-type == "RegistryString": VerticalLayout {
+                    spacing: AppTheme.spacing-sm;
+
+                    VerticalLayout {
+                        spacing: AppTheme.spacing-xs;
+                        Text {
+                            text: "Registry Path";
+                            color: AppTheme.text-secondary;
+                            font-size: AppTheme.font-sm;
+                        }
+                        LineEdit {
+                            text: data.registry-path;
+                            placeholder-text: "HKCU\\Software\\...";
+                            edited(val) => { data.registry-path = val; }
+                        }
+                    }
+
+                    VerticalLayout {
+                        spacing: AppTheme.spacing-xs;
+                        Text {
+                            text: "Registry Key";
+                            color: AppTheme.text-secondary;
+                            font-size: AppTheme.font-sm;
+                        }
+                        LineEdit {
+                            text: data.registry-key;
+                            placeholder-text: "ValueName";
+                            edited(val) => { data.registry-key = val; }
+                        }
+                    }
+
+                    VerticalLayout {
+                        spacing: AppTheme.spacing-xs;
+                        Text {
+                            text: "Expected Value";
+                            color: AppTheme.text-secondary;
+                            font-size: AppTheme.font-sm;
+                        }
+                        LineEdit {
+                            text: data.expected-value;
+                            placeholder-text: "1";
+                            edited(val) => { data.expected-value = val; }
+                        }
+                    }
+                }
+
+                if data.check-type == "ProcessAbsent" || data.check-type == "ProcessPresent": VerticalLayout {
+                    spacing: AppTheme.spacing-xs;
+                    Text {
+                        text: "Process Name";
+                        color: AppTheme.text-secondary;
+                        font-size: AppTheme.font-sm;
+                    }
+                    LineEdit {
+                        text: data.process-name;
+                        placeholder-text: "chrome.exe";
+                        edited(val) => { data.process-name = val; }
+                    }
+                }
+
+                if data.check-type == "DisplayResolution": VerticalLayout {
+                    spacing: AppTheme.spacing-xs;
+                    Text {
+                        text: "Expected Resolution";
+                        color: AppTheme.text-secondary;
+                        font-size: AppTheme.font-sm;
+                    }
+                    ComboBox {
+                        model: resolutions;
+                        current-value: data.expected-value;
+                        selected(val) => { data.expected-value = val; }
+                    }
+                }
+
+                if data.check-type == "DisplayRefreshRate": VerticalLayout {
+                    spacing: AppTheme.spacing-xs;
+                    Text {
+                        text: "Minimum Refresh Rate (Hz)";
+                        color: AppTheme.text-secondary;
+                        font-size: AppTheme.font-sm;
+                    }
+                    ComboBox {
+                        model: refresh-rates;
+                        current-value: data.expected-value;
+                        selected(val) => { data.expected-value = val; }
+                    }
+                }
+
+                if data.check-type == "HdrEnabled": VerticalLayout {
+                    spacing: AppTheme.spacing-xs;
+                    Text {
+                        text: "HDR Mode";
+                        color: AppTheme.text-secondary;
+                        font-size: AppTheme.font-sm;
+                    }
+                    ComboBox {
+                        model: hdr-options;
+                        current-value: data.expected-value;
+                        selected(val) => { data.expected-value = val; }
+                    }
+                }
+
+                // Enabled checkbox
+                HorizontalLayout {
+                    spacing: AppTheme.spacing-sm;
+                    CheckBox {
+                        checked: data.enabled;
+                        toggled => { data.enabled = self.checked; }
+                    }
+                    Text {
+                        text: "Enabled";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-md;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            // Spacer
+            Rectangle { vertical-stretch: 1; }
+
+            // Buttons
+            HorizontalLayout {
+                spacing: AppTheme.spacing-sm;
+
+                Rectangle {
+                    horizontal-stretch: 1;
+                    height: AppTheme.button-height;
+                    background: AppTheme.bg-elevated;
+                    border-radius: AppTheme.radius-sm;
+                    border-width: 1px;
+                    border-color: AppTheme.border;
+
+                    TouchArea {
+                        clicked => { cancel-clicked(); }
+                    }
+
+                    Text {
+                        text: "Cancel";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-md;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+
+                Rectangle {
+                    horizontal-stretch: 1;
+                    height: AppTheme.button-height;
+                    background: AppTheme.primary;
+                    border-radius: AppTheme.radius-sm;
+
+                    TouchArea {
+                        clicked => { save-clicked(data); }
+                    }
+
+                    Text {
+                        text: data.is-editing ? "Save" : "Add";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-md;
+                        font-weight: 600;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+    }
+}

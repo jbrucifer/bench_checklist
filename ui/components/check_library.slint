@@ -1,0 +1,232 @@
+// Check Library Modal
+// Browse and add pre-defined checks from the library
+
+import { AppTheme } from "../theme.slint";
+import { ScrollView, LineEdit } from "std-widgets.slint";
+import { LibraryCheckData } from "../types.slint";
+
+component LibraryItem inherits Rectangle {
+    in property <string> id;
+    in property <string> name;
+    in property <string> description;
+    in property <bool> already-added;
+
+    callback add-clicked();
+
+    background: AppTheme.bg-elevated;
+    border-radius: AppTheme.radius-sm;
+    height: 60px;
+
+    HorizontalLayout {
+        padding: AppTheme.spacing-md;
+        spacing: AppTheme.spacing-sm;
+
+        VerticalLayout {
+            horizontal-stretch: 1;
+            spacing: AppTheme.spacing-xs;
+
+            Text {
+                text: name;
+                color: already-added ? AppTheme.text-muted : AppTheme.text-primary;
+                font-size: AppTheme.font-md;
+            }
+
+            Text {
+                text: description;
+                color: AppTheme.text-secondary;
+                font-size: AppTheme.font-sm;
+                overflow: elide;
+            }
+        }
+
+        if !already-added: Rectangle {
+            width: 60px;
+            height: 28px;
+            background: AppTheme.primary;
+            border-radius: AppTheme.radius-sm;
+
+            TouchArea {
+                clicked => { add-clicked(); }
+            }
+
+            Text {
+                text: "Add";
+                color: AppTheme.text-primary;
+                font-size: AppTheme.font-sm;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+
+        if already-added: Text {
+            text: "Added";
+            color: AppTheme.text-muted;
+            font-size: AppTheme.font-sm;
+            vertical-alignment: center;
+        }
+    }
+}
+
+component CategorySection inherits Rectangle {
+    in property <string> category;
+    in property <[LibraryCheckData]> checks: [];
+    in property <string> search-query: "";
+
+    in-out property <bool> expanded: true;
+
+    callback add-clicked(string);
+
+    // Count visible checks in this category
+    property <int> visible-count: checks.length;
+
+    background: transparent;
+
+    VerticalLayout {
+        spacing: AppTheme.spacing-sm;
+
+        // Category header
+        Rectangle {
+            height: 36px;
+            background: AppTheme.bg-card;
+            border-radius: AppTheme.radius-sm;
+
+            TouchArea {
+                clicked => { expanded = !expanded; }
+            }
+
+            HorizontalLayout {
+                padding-left: AppTheme.spacing-md;
+                padding-right: AppTheme.spacing-md;
+
+                Text {
+                    text: (expanded ? "▼ " : "▶ ") + category;
+                    color: AppTheme.text-primary;
+                    font-size: AppTheme.font-md;
+                    font-weight: 600;
+                    vertical-alignment: center;
+                    horizontal-stretch: 1;
+                }
+
+                Text {
+                    text: visible-count + " checks";
+                    color: AppTheme.text-muted;
+                    font-size: AppTheme.font-sm;
+                    vertical-alignment: center;
+                }
+            }
+        }
+
+        // Category items (filtering is done in Rust)
+        if expanded: VerticalLayout {
+            spacing: AppTheme.spacing-xs;
+            padding-left: AppTheme.spacing-md;
+
+            for check in checks: Rectangle {
+                // Only show checks in this category
+                visible: check.category == category;
+                height: self.visible ? 60px : 0px;
+
+                LibraryItem {
+                    id: check.id;
+                    name: check.name;
+                    description: check.description;
+                    already-added: check.already-added;
+
+                    add-clicked => {
+                        root.add-clicked(check.id);
+                    }
+                }
+            }
+        }
+    }
+}
+
+export component CheckLibrary inherits Rectangle {
+    in property <[LibraryCheckData]> checks: [];
+    in property <[string]> categories: [];
+
+    callback add-clicked(string);
+    callback close-clicked();
+
+    property <string> search-query: "";
+
+    // Modal overlay
+    background: #000000.with-alpha(0.5);
+
+    TouchArea {
+        // Prevent clicks from passing through
+    }
+
+    // Modal dialog
+    Rectangle {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        width: 500px;
+        height: 600px;
+        background: AppTheme.bg-card;
+        border-radius: AppTheme.radius-lg;
+        border-width: 1px;
+        border-color: AppTheme.border;
+
+        VerticalLayout {
+            padding: AppTheme.spacing-lg;
+            spacing: AppTheme.spacing-md;
+
+            // Header
+            HorizontalLayout {
+                Text {
+                    text: "Check Library";
+                    color: AppTheme.text-primary;
+                    font-size: AppTheme.font-xl;
+                    font-weight: 700;
+                    horizontal-stretch: 1;
+                }
+
+                Rectangle {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: AppTheme.radius-sm;
+                    background: close-touch.has-hover ? AppTheme.bg-elevated : transparent;
+
+                    close-touch := TouchArea {
+                        clicked => { close-clicked(); }
+                    }
+
+                    Text {
+                        text: "✕";
+                        color: AppTheme.text-secondary;
+                        font-size: AppTheme.font-lg;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            // Search box
+            LineEdit {
+                placeholder-text: "Search checks...";
+                text: search-query;
+                edited(val) => { search-query = val; }
+            }
+
+            // Categories list
+            ScrollView {
+                vertical-stretch: 1;
+
+                VerticalLayout {
+                    spacing: AppTheme.spacing-md;
+
+                    for category in categories: CategorySection {
+                        category: category;
+                        checks: checks;
+                        search-query: search-query;
+
+                        add-clicked(id) => {
+                            root.add-clicked(id);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

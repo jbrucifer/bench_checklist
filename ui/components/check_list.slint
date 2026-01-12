@@ -1,0 +1,174 @@
+// Check List Component
+// Scrollable list of check items with filtering
+
+import { AppTheme } from "../theme.slint";
+import { ScrollView, CheckBox } from "std-widgets.slint";
+import { CheckItemData } from "../types.slint";
+
+component CheckItem inherits Rectangle {
+    in property <string> id;
+    in property <string> name;
+    in property <bool> passed;
+    in property <bool> enabled;
+    in property <string> current-value;
+    in property <string> expected-value;
+
+    callback toggled(bool);
+    callback edit-clicked();
+    callback delete-clicked();
+
+    background: AppTheme.bg-card;
+    border-radius: AppTheme.radius-md;
+    border-width: 1px;
+    border-color: AppTheme.border;
+    height: passed ? 52px : 72px;
+
+    HorizontalLayout {
+        padding: AppTheme.spacing-md;
+        spacing: AppTheme.spacing-sm;
+
+        // Status indicator bar (left edge)
+        Rectangle {
+            width: 4px;
+            background: passed ? AppTheme.success : AppTheme.error;
+            border-radius: 2px;
+        }
+
+        // Status icon
+        Text {
+            text: passed ? "✓" : "✗";
+            color: passed ? AppTheme.success : AppTheme.error;
+            font-size: AppTheme.font-lg;
+            vertical-alignment: center;
+            width: 20px;
+        }
+
+        // Toggle checkbox
+        CheckBox {
+            checked: enabled;
+            toggled => {
+                root.toggled(self.checked);
+            }
+        }
+
+        // Check details
+        VerticalLayout {
+            horizontal-stretch: 1;
+            spacing: AppTheme.spacing-xs;
+
+            // Check name
+            Text {
+                text: name;
+                color: enabled ? AppTheme.text-primary : AppTheme.text-muted;
+                font-size: AppTheme.font-md;
+                overflow: elide;
+            }
+
+            // Current vs Expected (only show for failures)
+            if !passed: Text {
+                text: "Current: " + current-value + " → Expected: " + expected-value;
+                color: AppTheme.text-secondary;
+                font-size: AppTheme.font-sm;
+                overflow: elide;
+            }
+        }
+
+        // Edit button
+        Rectangle {
+            width: 32px;
+            height: 32px;
+            border-radius: AppTheme.radius-sm;
+            background: touch-edit.has-hover ? AppTheme.bg-elevated : transparent;
+
+            touch-edit := TouchArea {
+                clicked => { edit-clicked(); }
+            }
+
+            Text {
+                text: "✎";
+                color: AppTheme.text-secondary;
+                font-size: AppTheme.font-md;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+
+        // Delete button
+        Rectangle {
+            width: 32px;
+            height: 32px;
+            border-radius: AppTheme.radius-sm;
+            background: touch-delete.has-hover ? AppTheme.error.with-alpha(0.2) : transparent;
+
+            touch-delete := TouchArea {
+                clicked => { delete-clicked(); }
+            }
+
+            Text {
+                text: "🗑";
+                color: touch-delete.has-hover ? AppTheme.error : AppTheme.text-secondary;
+                font-size: AppTheme.font-md;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+    }
+}
+
+export component CheckList inherits Rectangle {
+    in property <[CheckItemData]> checks: [];
+    in property <string> filter: "All";
+
+    callback toggled(string, bool);
+    callback edit-requested(string);
+    callback delete-requested(string);
+
+    background: transparent;
+
+    ScrollView {
+        VerticalLayout {
+            spacing: AppTheme.spacing-sm;
+            padding: AppTheme.spacing-xs;
+
+            for check in checks: Rectangle {
+                // Filter logic
+                visible: filter == "All" ||
+                         (filter == "Passed" && check.passed) ||
+                         (filter == "Failed" && !check.passed);
+                height: self.visible ? (check.passed ? 52px : 72px) : 0px;
+
+                CheckItem {
+                    id: check.id;
+                    name: check.name;
+                    passed: check.passed;
+                    enabled: check.enabled;
+                    current-value: check.current-value;
+                    expected-value: check.expected-value;
+
+                    toggled(val) => {
+                        root.toggled(check.id, val);
+                    }
+                    edit-clicked => {
+                        root.edit-requested(check.id);
+                    }
+                    delete-clicked => {
+                        root.delete-requested(check.id);
+                    }
+                }
+            }
+
+            // Empty state
+            if checks.length == 0: Rectangle {
+                height: 100px;
+
+                Text {
+                    text: "No checks configured.\nClick '+ Add' or 'Library' to add checks.";
+                    color: AppTheme.text-muted;
+                    font-size: AppTheme.font-md;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+        }
+    }
+}

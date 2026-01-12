@@ -1,3 +1,4 @@
+pub mod display;
 pub mod power_plan;
 pub mod processes;
 pub mod registry;
@@ -74,6 +75,9 @@ pub fn run_check(config: &CheckConfig) -> CheckResult {
         CheckType::RegistryString => registry::check_string(config),
         CheckType::ProcessAbsent => processes::check_absent(config),
         CheckType::ProcessPresent => processes::check_present(config),
+        CheckType::DisplayResolution => display::check_resolution(config),
+        CheckType::DisplayRefreshRate => display::check_refresh_rate(config),
+        CheckType::HdrEnabled => display::check_hdr(config),
     }
 }
 

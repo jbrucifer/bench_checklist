@@ -4,4 +4,7 @@ fn main() {
     {
         embed_resource::compile("app.rc", embed_resource::NONE);
     }
+
+    // Compile Slint UI files
+    slint_build::compile("ui/main.slint").unwrap();
 }

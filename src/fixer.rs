@@ -60,6 +60,12 @@ pub fn get_fix_capability(config: &CheckConfig) -> FixCapability {
         CheckType::ProcessPresent => FixCapability::Manual {
             reason: "Cannot auto-start applications".to_string(),
         },
+
+        CheckType::DisplayResolution | CheckType::DisplayRefreshRate | CheckType::HdrEnabled => {
+            FixCapability::Manual {
+                reason: "Display settings must be changed in Windows Settings".to_string(),
+            }
+        }
     }
 }
 
@@ -93,6 +99,9 @@ fn attempt_fix(config: &CheckConfig) -> FixResult {
         CheckType::RegistryString => fix_registry_string(config),
         CheckType::ProcessAbsent => fix_process_absent(config),
         CheckType::ProcessPresent => Err("Cannot auto-start applications".to_string()),
+        CheckType::DisplayResolution | CheckType::DisplayRefreshRate | CheckType::HdrEnabled => {
+            Err("Display settings cannot be auto-fixed".to_string())
+        }
     };
 
     match result {

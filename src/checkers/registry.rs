@@ -296,6 +296,17 @@ pub fn write_dword(path: &str, value_name: &str, data: u32) -> Result<(), String
     }
 }
 
+/// Read a DWORD value from the registry using full path
+/// This is a public wrapper for use by other modules
+pub fn read_dword_value(path: &str, value_name: &str) -> Result<u32, String> {
+    let (root, subkey) = match parse_root_key(path) {
+        Some(v) => v,
+        None => return Err(format!("Invalid registry path: {}", path)),
+    };
+
+    read_dword(root, subkey, value_name)
+}
+
 /// Write a string value to the registry
 /// Returns Ok(()) on success, Err with message on failure
 pub fn write_string(path: &str, value_name: &str, data: &str) -> Result<(), String> {

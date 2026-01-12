@@ -1,3 +1,2 @@
-pub mod settings_window;
-pub mod style;
+pub mod slint_bridge;
 pub mod tray;

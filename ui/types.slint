@@ -1,0 +1,42 @@
+// Bench Checklist Data Types
+// Shared type definitions for all components
+
+// Data model for a check item
+export struct CheckItemData {
+    id: string,
+    name: string,
+    passed: bool,
+    enabled: bool,
+    current-value: string,
+    expected-value: string,
+    check-type: string,
+}
+
+// Data model for a scenario
+export struct ScenarioData {
+    name: string,
+    description: string,
+}
+
+// Data model for library check
+export struct LibraryCheckData {
+    id: string,
+    name: string,
+    category: string,
+    description: string,
+    check-type: string,
+    already-added: bool,
+}
+
+// Check editor form data
+export struct CheckEditorData {
+    id: string,
+    name: string,
+    check-type: string,
+    enabled: bool,
+    expected-value: string,
+    registry-path: string,
+    registry-key: string,
+    process-name: string,
+    is-editing: bool,
+}

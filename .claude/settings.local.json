@@ -26,7 +26,12 @@
       "Bash(cargo check:*)",
       "Bash(powershell -Command \"Get-Process | Where-Object {$_ProcessName -like ''*edge*''} | Select-Object ProcessName, Id | Format-Table -AutoSize\")",
       "Bash(cargo run:*)",
-      "Bash(reg query \"HKCU\\\\Software\\\\Microsoft\\\\GameBar\")"
+      "Bash(reg query \"HKCU\\\\Software\\\\Microsoft\\\\GameBar\")",
+      "Bash(del \"c:\\\\projects\\\\bench_checklist\\\\src\\\\ui\\\\settings_window.rs\" \"c:\\\\projects\\\\bench_checklist\\\\src\\\\ui\\\\style.rs\")",
+      "Bash(cargo search:*)",
+      "Bash(rustc:*)",
+      "Bash(cargo update:*)",
+      "Bash(rustup update:*)"
     ]
   }
 }

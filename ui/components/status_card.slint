@@ -1,0 +1,98 @@
+// Status Card Component
+// Shows overall pass/fail status with progress bar
+
+import { AppTheme } from "../theme.slint";
+import { ProgressIndicator } from "std-widgets.slint";
+
+export component StatusCard inherits Rectangle {
+    in property <int> passed: 0;
+    in property <int> total: 0;
+
+    callback fix-clicked();
+
+    property <float> progress: total > 0 ? (passed / total) : 0;
+    property <bool> all-passed: passed == total && total > 0;
+    property <bool> all-failed: passed == 0 && total > 0;
+    property <color> status-color: all-passed ? AppTheme.success :
+                                   all-failed ? AppTheme.error :
+                                   AppTheme.warning;
+
+    background: AppTheme.bg-card;
+    border-radius: AppTheme.radius-md;
+    border-width: 1px;
+    border-color: AppTheme.border;
+    height: 100px;
+
+    VerticalLayout {
+        padding: AppTheme.spacing-lg;
+        spacing: AppTheme.spacing-sm;
+
+        HorizontalLayout {
+            spacing: AppTheme.spacing-sm;
+
+            // Status icon
+            Rectangle {
+                width: 12px;
+                height: 12px;
+                border-radius: 6px;
+                background: status-color;
+            }
+
+            // Status text
+            Text {
+                text: all-passed ? "All Passed" :
+                      all-failed ? "All Failed" :
+                      total == 0 ? "No Checks" :
+                      "Some Failed";
+                color: AppTheme.text-primary;
+                font-size: AppTheme.font-lg;
+                font-weight: 600;
+                horizontal-stretch: 1;
+            }
+
+            // Pass count
+            Text {
+                text: passed + " / " + total;
+                color: AppTheme.text-secondary;
+                font-size: AppTheme.font-md;
+            }
+        }
+
+        // Progress bar
+        Rectangle {
+            height: 8px;
+            border-radius: 4px;
+            background: AppTheme.bg-elevated;
+
+            Rectangle {
+                width: parent.width * progress;
+                height: 100%;
+                border-radius: 4px;
+                background: status-color;
+            }
+        }
+
+        // Fix All button (only show if there are failures)
+        if !all-passed && total > 0: HorizontalLayout {
+            alignment: end;
+
+            Rectangle {
+                background: AppTheme.primary;
+                border-radius: AppTheme.radius-sm;
+                height: 28px;
+                width: 80px;
+
+                TouchArea {
+                    clicked => { fix-clicked(); }
+                    Text {
+                        text: "Fix All";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-sm;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+    }
+}

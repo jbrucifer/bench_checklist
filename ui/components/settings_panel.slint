@@ -1,0 +1,99 @@
+// Settings Panel Component
+// Collapsible panel for poll interval and notification settings
+
+import { AppTheme } from "../theme.slint";
+import { Slider, CheckBox } from "std-widgets.slint";
+
+export component SettingsPanel inherits Rectangle {
+    in-out property <int> poll-interval: 5;
+    in-out property <bool> notify-on-drift: true;
+
+    callback poll-changed(int);
+    callback notify-changed(bool);
+
+    property <bool> expanded: false;
+
+    background: AppTheme.bg-card;
+    border-radius: AppTheme.radius-md;
+    border-width: 1px;
+    border-color: AppTheme.border;
+    height: expanded ? 140px : 44px;
+
+    VerticalLayout {
+        padding: AppTheme.spacing-md;
+        spacing: AppTheme.spacing-sm;
+
+        // Header (clickable to expand/collapse)
+        Rectangle {
+            height: 24px;
+
+            TouchArea {
+                clicked => { expanded = !expanded; }
+            }
+
+            HorizontalLayout {
+                Text {
+                    text: (expanded ? "▼ " : "▶ ") + "Advanced Settings";
+                    color: AppTheme.text-secondary;
+                    font-size: AppTheme.font-sm;
+                    font-weight: 600;
+                    horizontal-stretch: 1;
+                }
+            }
+        }
+
+        // Settings content
+        if expanded: VerticalLayout {
+            spacing: AppTheme.spacing-md;
+
+            // Poll interval slider
+            VerticalLayout {
+                spacing: AppTheme.spacing-xs;
+
+                HorizontalLayout {
+                    Text {
+                        text: "Poll Interval";
+                        color: AppTheme.text-primary;
+                        font-size: AppTheme.font-sm;
+                        horizontal-stretch: 1;
+                    }
+                    Text {
+                        text: poll-interval + "s";
+                        color: AppTheme.text-secondary;
+                        font-size: AppTheme.font-sm;
+                    }
+                }
+
+                Slider {
+                    minimum: 1;
+                    maximum: 60;
+                    value: poll-interval;
+                    changed(val) => {
+                        poll-interval = Math.round(val);
+                        poll-changed(poll-interval);
+                    }
+                }
+            }
+
+            // Drift notification checkbox
+            HorizontalLayout {
+                spacing: AppTheme.spacing-sm;
+
+                CheckBox {
+                    checked: notify-on-drift;
+                    toggled => {
+                        notify-on-drift = self.checked;
+                        notify-changed(notify-on-drift);
+                    }
+                }
+
+                Text {
+                    text: "Notify on setting drift";
+                    color: AppTheme.text-primary;
+                    font-size: AppTheme.font-sm;
+                    vertical-alignment: center;
+                }
+            }
+        }
+    }
+}

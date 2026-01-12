@@ -236,7 +236,7 @@ fn open_settings(settings_open: &Arc<AtomicBool>, app_state: &AppState) {
     if !settings_open.load(Ordering::SeqCst) {
         settings_open.store(true, Ordering::SeqCst);
         tracing::info!("Opening settings window...");
-        let _ = ui::settings_window::SettingsWindow::run(app_state.clone());
+        let _ = ui::slint_bridge::run(app_state.clone());
         settings_open.store(false, Ordering::SeqCst);
         tracing::info!("Settings window closed");
     }
