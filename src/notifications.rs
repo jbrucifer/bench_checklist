@@ -1,13 +1,13 @@
 use crate::checkers::{CheckResult, OverallStatus};
 use winrt_notification::{Duration, Sound, Toast};
 
-const APP_ID: &str = "BenchChecklist";
-
 /// Send a toast notification for drift detection
 pub fn notify_drift(failed_checks: &[&CheckResult]) {
     if failed_checks.is_empty() {
         return;
     }
+
+    tracing::info!("Sending drift notification for {} checks", failed_checks.len());
 
     let title = if failed_checks.len() == 1 {
         "⚠ Setting Changed".to_string()
@@ -28,18 +28,23 @@ pub fn notify_drift(failed_checks: &[&CheckResult]) {
         body
     };
 
-    let _ = Toast::new(APP_ID)
+    let result = Toast::new(Toast::POWERSHELL_APP_ID)
         .title(&title)
         .text1(&body)
         .sound(Some(Sound::Default))
         .duration(Duration::Long)
         .show();
+
+    match result {
+        Ok(_) => tracing::info!("Toast notification sent successfully"),
+        Err(e) => tracing::error!("Failed to send toast notification: {:?}", e),
+    }
 }
 
 /// Send a toast notification that all checks passed
 #[allow(dead_code)]
 pub fn notify_all_passed() {
-    let _ = Toast::new(APP_ID)
+    let _ = Toast::new(Toast::POWERSHELL_APP_ID)
         .title("All Checks Passed")
         .text1("Your system is configured for optimal performance.")
         .sound(Some(Sound::Default))
@@ -65,7 +70,7 @@ pub fn notify_status(status: OverallStatus, passed: usize, total: usize) {
         ),
     };
 
-    let _ = Toast::new(APP_ID)
+    let _ = Toast::new(Toast::POWERSHELL_APP_ID)
         .title(&title)
         .text1(&body)
         .sound(Some(Sound::Default))

@@ -75,7 +75,9 @@ impl AppState {
         }
 
         // Notify on drift if enabled
+        tracing::debug!("Drift detection: notify_on_drift={}, drifted_count={}", inner.notify_on_drift, drifted.len());
         if inner.notify_on_drift && !drifted.is_empty() {
+            tracing::info!("Notifying about {} drifted checks", drifted.len());
             notifications::notify_drift(&drifted);
         }
 
